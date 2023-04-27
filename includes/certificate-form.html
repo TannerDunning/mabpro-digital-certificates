@@ -1,0 +1,30 @@
+<?php wp_nonce_field( 'mabpro_certificate_form', 'mabpro_certificate_form_nonce' ); ?>
+<form action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
+    <label for="course_date">Course Date:</label>
+    <input type="date" id="course_date" name="course_date" required>
+    
+    <label for="class_type">Class Type:</label>
+    <select name="class_type">
+        <option value="M1 MAB">M1 MAB</option>
+        <option value="M2 MAB">M2 MAB</option>
+        <option value="CPR">CPR</option>
+    </select>
+
+    <div id="students-container">
+        <div class="student-section">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="students[0][first_name]" required>
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="students[0][last_name]" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="students[0][email]" required>
+        </div>
+    </div>
+
+    <div id="repeatable-student-section">
+        <input type="button" class="button-plus" value="+ Add another student">
+    </div>
+    
+    <input type="hidden" name="action" value="submit_certificate_form">
+    <input type="submit" name="submit_certificate_form" value="Send Certificates">
+</form>
