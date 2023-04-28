@@ -67,7 +67,6 @@ update_user_meta( $instructor_id, 'cert_balance', $cert_balance );
     }
     wp_reset_postdata();
 
-    send_certificate_emails($students, $course_date, $class_type);
 
         // Generate PDF for the current student
         generate_certificate_pdf($student, $course_date, $class_type, $last_certificate_id);
@@ -126,39 +125,10 @@ function generate_certificate_pdf( $student, $course_date, $class_type, $certifi
 
     // Write content
     $pdf->writeHTML($html, true, false, true, false, '');
-    $pdf_string = $pdf->Output('', 'S');
+    return $pdf->Output('', 'S');
 
-// Get the current user's email
-$current_user = wp_get_current_user();
-$instructor_email = $current_user->user_email;
 
-// Prepare the email
-$to = $student['email'];
-$subject = 'Your Certificate';
-$message = 'Dear ' . $student['first_name'] . ',<br><br>Here is your certificate.<br><br>Best regards,<br>MABPRO Team';
-$headers = array('Content-Type: text/html; charset=UTF-8');
-$attachments = array();
 
-// Create a temporary file to store the PDF content
-$tmp_file = wp_tempnam();
-file_put_contents($tmp_file, $pdf_string);
-
-// Add the temporary file to the attachments array
-$attachments[] = $tmp_file;
-
-// Send the email to the student
-wp_mail($to, $subject, $message, $headers, $attachments);
-
-// Send a copy to the office
-$to_office = 'office@mabpro.com';
-wp_mail($to_office, $subject, $message, $headers, $attachments);
-
-// Send a copy to the instructor
-$to_instructor = $instructor_email;
-wp_mail($to_instructor, $subject, $message, $headers, $attachments);
-
-// Delete the temporary file
-unlink($tmp_file);
 
 
     
@@ -245,7 +215,126 @@ function display_verification_form( $atts ) {
     require_once plugin_dir_path( __FILE__ ) . 'verification-form.php';
     return ob_get_clean();
 }
+function send_certificate_emails($students, $course_date, $class_type) {
+    // Get the last certificate ID from the most recent certificate post
+    $last_certificate_id = get_last_certificate_id();
 
+    // Generate and send certificates to students
+    foreach ($students as $student) {
+        // Increment the certificate ID
+        $last_certificate_id++;
+
+        // Generate PDF for the current student
+        generate_certificate_pdf($student, $course_date, $class_type, $last_certificate_id);
+    }
+
+    // Send a single email to the instructor and office with all certificates attached
+    send_email_to_instructor_and_office($students, $course_date, $class_type);
+}
+
+function get_last_certificate_id() {
+    $last_certificate_id = 0;
+    $args = array(
+        'post_type' => 'mabpro_certificates',
+        'posts_per_page' => 1,
+        'orderby' => 'date',
+        'order' => 'DESC',
+    );
+    $query = new WP_Query($args);
+    if ($query->have_posts()) {
+        $query->the_post();
+        $last_certificate_id = (int) get_post_meta(get_the_ID(), 'certificate_id', true);
+    }
+    wp_reset_postdata();
+    return $last_certificate_id;
+}
+
+function send_email_to_instructor_and_office($students, $course_date, $class_type) {
+    // Get the current user's email
+    $current_user = wp_get_current_user();
+    $instructor_email = $current_user->user_email;
+
+    // Prepare the email
+    $to = $instructor_email;
+    $subject = 'Certificates for ' . $class_type . ' on ' . $course_date;
+    $message = 'Dear Instructor,<br><br>Attached are the certificates for the ' . $class_type . ' class held on ' . $course_date . '.<br><br>Best regards,<br>MABPRO Team';
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    $attachments = generate_certificates_attachments($students, $course_date, $class_type);
+
+    // Send the email to the instructor
+    wp_mail($to, $subject, $message, $headers, $attachments);
+
+    // Send a copy to the office
+    $to_office = 'office@mabpro.com';
+    wp_mail($to_office, $subject, $message, $headers, $attachments);
+
+    // Delete the temporary files
+    foreach ($attachments as $attachment) {
+        unlink($attachment);
+    }
+}
+
+function generate_certificates_attachments($students, $course_date, $class_type) {
+    $attachments = array();
+    foreach ($students as $student) {
+        // Get the certificate ID
+        $certificate_id = get_certificate_id_by_student_data($student, $course_date, $class_type);
+        
+        // Generate the certificate PDF
+        $pdf_string = generate_certificate_pdf($student, $course_date, $class_type, $certificate_id);
+
+        // Create a temporary file to store the PDF content
+        $tmp_file = wp_tempnam();
+        file_put_contents($tmp_file, $pdf_string);
+
+        // Add the temporary file to the attachments array
+        $attachments[] = $tmp_file;
+    }
+    return $attachments;
+}
+
+function get_certificate_id_by_student_data($student, $course_date, $class_type) {
+    $certificate_id = 0;
+$args = array(
+'post_type' => 'mabpro_certificates',
+'meta_query' => array(
+'relation' => 'AND',
+array(
+'key' => 'first_name',
+'value' => $student['first_name'],
+'compare' => '=',
+),
+array(
+'key' => 'last_name',
+'value' => $student['last_name'],
+'compare' => '=',
+),
+array(
+'key' => 'email',
+'value' => $student['email'],
+'compare' => '=',
+),
+array(
+'key' => 'class_type',
+'value' => $class_type,
+'compare' => '=',
+),
+array(
+'key' => 'course_date',
+'value' => $course_date,
+'compare' => '=',
+),
+),
+'posts_per_page' => 1,
+);
+$query = new WP_Query($args);
+if ($query->have_posts()) {
+    $query->the_post();
+    $certificate_id = (int) get_post_meta(get_the_ID(), 'certificate_id', true);
+}
+wp_reset_postdata();
+return $certificate_id;
+}
 add_shortcode( 'mabpro_verification_form', 'display_verification_form' );
 add_action( 'admin_post_submit_certificate_form', 'process_certificate_form' );
 add_action( 'admin_post_nopriv_submit_certificate_form', 'process_certificate_form' );
