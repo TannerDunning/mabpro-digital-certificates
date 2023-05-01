@@ -6,7 +6,7 @@ function add_cert_balance_field( $order_id ) {
     foreach ( $items as $item ) {
         $product_id = $item->get_product_id(); // Get the product ID
         // Check if the product is a token product
-        if ( $product_id == 34491 ) { // Replace 123 with the ID of your token product
+        if ( $product_id == 34491 ) { // Replace 34491 with the ID of your token product
             $user_id = $order->get_user_id(); // Get the user ID
             $cert_balance = get_user_meta( $user_id, 'cert_balance', true ); // Get the current balance
             if ( ! $cert_balance ) {
@@ -18,4 +18,4 @@ function add_cert_balance_field( $order_id ) {
         }
     }
 }
-add_action( 'woocommerce_thankyou', 'add_cert_balance_field' );
+add_action( 'woocommerce_payment_complete', 'add_cert_balance_field' );
