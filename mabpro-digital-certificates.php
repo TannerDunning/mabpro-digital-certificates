@@ -70,8 +70,8 @@ require_once plugin_dir_path(__FILE__) . 'functions/auto-complete-orders.php';
 
 function mabpro_digital_certificates_init() {
     if ( is_page( 'send-certificates' ) ) { // Updated page URL
-        // Limit plugin's functionality to specific page
-        wp_enqueue_script('add-student', plugin_dir_url(__FILE__) . 'public/js/add-student.js', array('jquery'), '', true);
+        // Enqueue js for adding students
+        wp_enqueue_script('add-students', plugin_dir_url(__FILE__).'../public/js/add-students.js', array('jquery'), '', true);
     }
 }
 
