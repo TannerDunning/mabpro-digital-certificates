@@ -66,6 +66,7 @@ add_action( 'init', 'mabpro_digital_certificates_init' );
 
 require_once plugin_dir_path(__FILE__) . 'includes/process-certificate-form.php';
 require_once plugin_dir_path(__FILE__) . 'functions/mabpro-certificates-post-type.php';
+require_once plugin_dir_path(__FILE__) . 'functions/auto-complete-orders.php';
 
 function mabpro_digital_certificates_init() {
     if ( is_page( 'send-certificates' ) ) { // Updated page URL
