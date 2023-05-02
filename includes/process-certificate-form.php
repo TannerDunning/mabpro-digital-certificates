@@ -10,6 +10,9 @@ function process_certificate_form() {
 $instructor_id = get_current_user_id();
 $cert_balance = get_user_meta( $instructor_id, 'cert_balance', true );
 // Check if the instructor has enough tokens to send the certificates
+      if (is_null($cert_balance)) {
+    $cert_balance = 0;
+}
 if ( count( $students ) > $cert_balance ) {
     wp_die( 'You do not have enough tokens to send certificates for all students.' );
 }
