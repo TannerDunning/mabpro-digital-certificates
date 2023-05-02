@@ -1,6 +1,6 @@
 <?php
 function process_certificate_form() {
-    require_once plugin_dir_path( __FILE__ ) . '../libs/tcpdf.php';
+    require_once plugin_dir_path( __FILE__ ) . '../libs/TCPDF/tcpdf.php';
     if ( isset( $_POST['submit_certificate_form'] ) ) {
         // Verify the nonce for security
         if ( ! isset( $_POST['mabpro_certificate_form_nonce'] ) || ! wp_verify_nonce( $_POST['mabpro_certificate_form_nonce'], 'mabpro_certificate_form' ) ) {
