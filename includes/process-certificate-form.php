@@ -1,6 +1,5 @@
 <?php
 function process_certificate_form() {
-  require_once plugin_dir_path( __FILE__ ) . '../libs/TCPDF/tcpdf_config.php';
     require_once plugin_dir_path( __FILE__ ) . '../libs/TCPDF/tcpdf.php';
     if ( isset( $_POST['submit_certificate_form'] ) ) {
         // Verify the nonce for security
