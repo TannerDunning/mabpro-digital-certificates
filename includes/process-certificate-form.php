@@ -13,39 +13,40 @@ $cert_balance = get_user_meta( $instructor_id, 'cert_balance', true );
       if (is_null($cert_balance)) {
     $cert_balance = 0;
 }
+// Sanitize and validate the form data
+$course_date = sanitize_text_field( $_POST['course_date'] );
+if ( empty( $course_date ) ) {
+    wp_die( 'Course date is required.' );
+}
+
+// Process the student information
+$students = array();
+foreach ( $_POST['students'] as $student_data ) {
+    $student = array();
+
+    // Sanitize and validate student data
+    $student['first_name'] = sanitize_text_field( $student_data['first_name'] );
+    if ( empty( $student['first_name'] ) ) {
+        wp_die( 'Student first name is required.' );
+    }
+
+    $student['last_name'] = sanitize_text_field( $student_data['last_name'] );
+    if ( empty( $student['last_name'] ) ) {
+        wp_die( 'Student last name is required.' );
+    }
+
+    $student['email'] = sanitize_email( $student_data['email'] );
+    if ( ! is_email( $student['email'] ) ) {
+        wp_die( 'Invalid student email address.' );
+    }
+
+    $students[] = $student;
+}
+
+// Check if the instructor has enough tokens to send certificates for all students
 if ( count( $students ) > $cert_balance ) {
     wp_die( 'You do not have enough tokens to send certificates for all students.' );
 }
-
-        // Sanitize and validate the form data
-        $course_date = sanitize_text_field( $_POST['course_date'] );
-        if ( empty( $course_date ) ) {
-            wp_die( 'Course date is required.' );
-        }
-
-        // Process the student information
-        $students = array();
-        foreach ( $_POST['students'] as $student_data ) {
-            $student = array();
-
-            // Sanitize and validate student data
-            $student['first_name'] = sanitize_text_field( $student_data['first_name'] );
-            if ( empty( $student['first_name'] ) ) {
-                wp_die( 'Student first name is required.' );
-            }
-
-            $student['last_name'] = sanitize_text_field( $student_data['last_name'] );
-            if ( empty( $student['last_name'] ) ) {
-                wp_die( 'Student last name is required.' );
-            }
-
-            $student['email'] = sanitize_email( $student_data['email'] );
-            if ( ! is_email( $student['email'] ) ) {
-                wp_die( 'Invalid student email address.' );
-            }
-
-            $students[] = $student;
-        }
 // Deduct the tokens from the instructor's balance
 $cert_balance -= count( $students );
 update_user_meta( $instructor_id, 'cert_balance', $cert_balance );
