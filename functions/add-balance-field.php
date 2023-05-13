@@ -18,4 +18,4 @@ function add_cert_balance_field( $order_id ) {
         }
     }
 }
-add_action( 'woocommerce_payment_complete', 'add_cert_balance_field' );
+add_action( 'woocommerce_order_status_completed', 'add_cert_balance_field' );
