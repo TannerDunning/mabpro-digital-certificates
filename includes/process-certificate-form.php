@@ -118,7 +118,7 @@ function generate_certificate_pdf( $student, $course_date, $class_type, $certifi
     $pdf->Image($background_image, 0, 0, $pdf->getPageWidth(), $pdf->getPageHeight(), '', '', '', false, 300, '', false, false, 0);
 
     // Set font
-    $pdf->SetFont('helvetica', '', 20);
+    $pdf->SetFont('times', '', 20);
 
     // Content
     $html = '
