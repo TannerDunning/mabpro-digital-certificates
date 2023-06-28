@@ -1,5 +1,6 @@
 <?php
 function display_instructor_cert_balance() {
+    error_log('display_instructor_cert_balance function started'); // Log the start of the function
     $user_id = get_current_user_id();
     $balance = get_user_meta( $user_id, 'cert_balance', true );
     
