@@ -22,4 +22,3 @@ function add_cert_balance_field( $order_id ) {
     }
     error_log('add_cert_balance_field function ended'); // Log the end of the function
 }
-add_action( 'woocommerce_order_status_completed', 'add_cert_balance_field' );

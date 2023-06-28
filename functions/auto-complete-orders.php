@@ -14,6 +14,8 @@ add_action('woocommerce_order_status_changed', function ($order_id, $old_status,
         // Update the order status to "completed".
         $order->update_status('completed');
         error_log('woocommerce_order_status_changed function ended'); // Log the end of the function
+   // Call the add_cert_balance_field function directly
+   add_cert_balance_field($order_id);
     }
 }, 10, 3);
 ?>
