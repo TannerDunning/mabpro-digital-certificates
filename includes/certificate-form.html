@@ -1,3 +1,15 @@
+<style>
+    /* Add margin to the bottom of all input fields and select boxes */
+    form input, form select {
+        margin-bottom: 10px;
+    }
+
+    /* Add margin to the bottom of all buttons */
+    form input[type="button"], form input[type="submit"] {
+        margin-top: 10px;
+    }
+</style>
+
 <?php wp_nonce_field( 'mabpro_certificate_form', 'mabpro_certificate_form_nonce' ); ?>
 <form action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" method="post">
     <label for="course_date">Course Date:</label>
