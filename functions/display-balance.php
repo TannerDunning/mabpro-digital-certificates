@@ -11,7 +11,7 @@ function display_instructor_cert_balance() {
     }
 
     // If there is a cert_balance meta field, return the balance
-    return '<div class="cert_balance_value">Your current certificate balance is: ' . $balance . '</div>';
+    return '<div class="cert_balance_message">Your current certificate balance is: <span class="balance_number">' . $balance . '</span></div>';
 }
 add_shortcode( 'instructor_cert_balance', 'display_instructor_cert_balance' );
 ?>
