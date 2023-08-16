@@ -1,11 +1,16 @@
 <?php
-echo '<style>
-    .balance_number {
-        color: #FFF; /* White color */
-        font-size: 32px; /* Font size */
-        font-weight: bold; /* Bold text */
-    }
-</style>';
+function enqueue_balance_number_style() {
+    ?>
+    <style>
+        .balance_number {
+            color: #FFF; /* White color */
+            font-size: 32px; /* Font size */
+            font-weight: bold; /* Bold text */
+        }
+    </style>
+    <?php
+}
+add_action( 'wp_head', 'enqueue_balance_number_style' );
 
 function display_instructor_cert_balance() {
     error_log('display_instructor_cert_balance function started'); // Log the start of the function
