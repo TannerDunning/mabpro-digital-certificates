@@ -73,7 +73,7 @@ require_once plugin_dir_path( __FILE__ ) . 'functions/display-balance.php';
 function mabpro_digital_certificates_init() {
     if ( is_page( 'send-digital-certificates' ) ) { // Updated page URL
         // Enqueue js for adding students
-        wp_enqueue_script('add-students', plugin_dir_url(__FILE__).'../public/js/add-students.js', array('jquery'), '', true);
+        wp_enqueue_script('add-students', plugin_dir_url(__FILE__).'/public/js/add-students.js', array('jquery'), '', true);
     }
 }
 
