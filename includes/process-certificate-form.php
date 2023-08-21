@@ -1,6 +1,7 @@
 <?php
 function process_certificate_form() {
-    require_once plugin_dir_path( __FILE__ ) . '../libs/TCPDF/tcpdf.php';
+  error_log('Processing certificate form started');   
+  require_once plugin_dir_path( __FILE__ ) . '../libs/TCPDF/tcpdf.php';
     if ( isset( $_POST['submit_certificate_form'] ) ) {
         // Verify the nonce for security
         if ( ! isset( $_POST['mabpro_certificate_form_nonce'] ) || ! wp_verify_nonce( $_POST['mabpro_certificate_form_nonce'], 'mabpro_certificate_form' ) ) {
@@ -68,6 +69,7 @@ update_user_meta( $instructor_id, 'cert_balance', $cert_balance );
     if ($query->have_posts()) {
         $query->the_post();
         $last_certificate_id = (int) get_post_meta(get_the_ID(), 'certificate_id', true);
+      error_log('Last certificate ID in get_last_certificate_id function: ' . $last_certificate_id);
     }
     wp_reset_postdata();
 
@@ -220,9 +222,11 @@ function display_verification_form( $atts ) {
     return ob_get_clean();
 }
 function send_certificate_emails($students, $course_date, $class_type) {
-    // Get the last certificate ID from the most recent certificate post
+  error_log('Starting send_certificate_emails function');  
+  // Get the last certificate ID from the most recent certificate post
     $last_certificate_id = get_last_certificate_id();
-
+error_log('Last certificate ID retrieved: ' . $last_certificate_id);
+  error_log('Generating PDFs for ' . count($students) . ' students');
     // Generate and send certificates to students
     foreach ($students as $student) {
         // Increment the certificate ID
@@ -230,10 +234,12 @@ function send_certificate_emails($students, $course_date, $class_type) {
 
         // Generate PDF for the current student
         generate_certificate_pdf($student, $course_date, $class_type, $last_certificate_id);
+      error_log('Generated PDF for student: ' . $student['first_name'] . ' ' . $student['last_name']);
     }
 
     // Send a single email to the instructor and office with all certificates attached
     send_email_to_instructor_and_office($students, $course_date, $class_type);
+  error_log('Email sent to instructor and office');
 }
 
 function get_last_certificate_id() {
@@ -266,9 +272,12 @@ function send_email_to_instructor_and_office($students, $course_date, $class_typ
     $attachments = generate_certificates_attachments($students, $course_date, $class_type);
 
     // Send the email to the instructor
+  error_log('Preparing to send email to instructor: ' . $to);
     wp_mail($to, $subject, $message, $headers, $attachments);
+  error_log('Email sent to instructor');
 
     // Send a copy to the office
+  error_log('Preparing to send email to office: ' . $to_office);
     $to_office = 'office@mabpro.com';
     wp_mail($to_office, $subject, $message, $headers, $attachments);
 
@@ -294,7 +303,8 @@ function generate_certificates_attachments($students, $course_date, $class_type)
         // Add the temporary file to the attachments array
         $attachments[] = $tmp_file;
     }
-    return $attachments;
+  error_log('Generated ' . count($attachments) . ' certificate attachments');  
+  return $attachments;
 }
 
 function get_certificate_id_by_student_data($student, $course_date, $class_type) {
